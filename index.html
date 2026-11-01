@@ -1,3 +1,20 @@
+요청하신 데이터 표기 방식 및 디자인 여백 조정 사항을 모두 반영한 수정본 코드입니다.
+
+📋 주요 수정 사항 요약
+
+1. 매치 정보 바 (Match Info Bar) 데이터 개선
+  ⚬ 제목 라벨 제거: DATE, TIME, COMPETITION, VENUE, MATCH TYPE 텍스트를 제거하고 순수 데이터 수치만 출력합니다.
+  ⚬ 텍스트 색상 통일: 하이라이트 골드 색상을 제거하고 모든 정보 글자를 순백색(#ffffff)으로 통일했습니다.
+  ⚬ 경기 유형 명칭 간소화: AWAY MATCH / HOME MATCH \rightarrow Away / Home으로 깔끔하게 변경했습니다.
+2. 타임라인 스트림 (Timeline Stream) 이벤트 표기 보완
+  ⚬ 선수명 미입력 시 약어 노출 방지: 카드/골 등 이벤트에서 선수명(p1)이 입력되지 않았을 때 기존에 LIV 등 상대 팀 약어가 출력되던 현상을 수정하여, 이벤트 명칭만 깨끗하게 표시됩니다.
+  ⚬ 교체 선수 자동 번호 할당: 상대 팀 교체 시 선수명이 입력되지 않아 -로 표기되던 항목을 교체 순서에 따라 Player 1, Player 2, Player 3... 으로 자동 순차 표기하도록 보완했습니다.
+3. 디자인 여백(Spacing) 디테일 개선
+  ⚬ 소제목 하단 여백 확대: MATCH PERFORMANCE STATS, Starting XI & Formation 등 섹션 타이틀 하단 여백을 넓혀 답답하지 않도록 개선했습니다.
+  ⚬ 타임라인 카드 내부 여백 확대: 이벤트 카드 헤더(이벤트 이름)와 선수 이름 사이의 간격을 늘려 가시성을 높였습니다.
+
+📜 수정 완료된 전체 HTML 코드
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -170,13 +187,14 @@
       text-shadow: 0 4px 12px rgba(239, 1, 7, 0.3);
     }
 
+    /* ★ 소제목 하단 여백 확장 (20px -> 28px) ★ */
     .section-title {
       font-size: 14px;
       color: var(--arsenal-gold);
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 20px;
+      margin-bottom: 28px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -365,6 +383,7 @@
       box-shadow: 0 4px 16px rgba(255, 77, 79, 0.25);
     }
 
+    /* ★ 타임라인 헤더와 선수 이름 간격 조정 ★ */
     .event-card-header {
       font-size: 12px;
       font-weight: 600;
@@ -372,7 +391,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
     }
 
@@ -381,11 +400,12 @@
     .event-card-header.yc { color: #fadb14; }
     .event-card-header.rc { color: #ff4d4f; }
 
+    /* ★ 선수 이름 상단 여백 확장 (3px -> 8px) ★ */
     .player-name-text {
       font-size: 15px;
       font-weight: 800;
       color: #ffffff;
-      margin-top: 3px;
+      margin-top: 8px;
     }
 
     .assist-tag {
@@ -425,6 +445,7 @@
       grid-template-columns: 1fr 1fr;
       align-items: center;
       gap: 8px;
+      margin-top: 4px;
     }
 
     .sub-name-out {
@@ -472,25 +493,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-    }
-
-    .info-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--pl-sub-text);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      justify-content: center;
     }
 
     .info-value {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 800;
       color: #ffffff;
-    }
-
-    .info-value.highlight {
-      color: var(--arsenal-gold);
     }
 
     .stats-group {
@@ -638,7 +647,6 @@
 <body>
 
   <div class="config-panel">
-    <!-- value 속성을 빈값으로 비워둠 (시트 ID 직접 노출 방지) -->
     <input type="text" id="sheet-id-input" placeholder="구글 시트 URL 또는 ID 입력" value="">
     <button class="btn-sync" onclick="syncSheetData(true)">🔄 시트 데이터 동기화</button>
   </div>
@@ -681,7 +689,6 @@
   </div>
 
   <script>
-    // ★ 보안 설정: 비밀번호 지정 (기본값: 1886) ★
     const SECRET_PIN = "1886";
 
     function saveCardAsImage(elementId, fileName) {
@@ -717,16 +724,13 @@
       return lines.map(line => line.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1').trim()));
     }
 
-    // ★ 보안 인증 로직 적용된 동기화 함수 ★
     async function syncSheetData(isManualClick = false) {
       let rawId = document.getElementById('sheet-id-input').value.trim();
 
-      // 입력창이 비어있으면 LocalStorage에 저장된 내 시트 ID 불러오기
       if (!rawId) {
         rawId = localStorage.getItem('my_arsenal_sheet_id') || '';
       }
 
-      // 내 브라우저에 저장된 시트 ID가 없거나 수동 동기화 요청 시 암호 확인
       if (!rawId || isManualClick) {
         if (!rawId) {
           const inputPin = prompt("🔑 접근 암호를 입력하세요:");
@@ -746,7 +750,6 @@
       try {
         const matchesData = await fetchCSV(rawId, 'matches');
         
-        // 올바른 시트 ID 확인 성공 시 내 브라우저에만 비밀 기억
         localStorage.setItem('my_arsenal_sheet_id', rawId);
         document.getElementById('sheet-id-input').value = rawId;
 
@@ -770,7 +773,6 @@
 
       if (data[5]) awayTeam = data[5][1] || data[5][2] || 'Chelsea';
 
-      // ★ data[3](4행)을 data[2](3행: Score 위치)로 수정 ★
       if (data[2] && data[2][4] === 'Score') {
         arsScore = data[2][5] || '0';
         awayScore = data[2][6] || '0';
@@ -784,7 +786,6 @@
       document.getElementById('away-team-stats').innerText = rightTeam;
       document.getElementById('score-stats').innerText = scoreText;
     }
-
 
     function renderPitch(data) {
       const pitchTarget = document.getElementById('pitch-target');
@@ -868,6 +869,7 @@
       }
     }
 
+    // ★ 타임라인 선수 미입력 처리 및 순차 Player 1, 2 자동 할당 로직 적용 ★
     function renderTimeline(data) {
       const tlContainer = document.getElementById('timeline-target');
       tlContainer.innerHTML = '<div class="v-timeline-line"></div>';
@@ -977,6 +979,9 @@
       }
       finalStream.push({ isBoundary: true, text: 'FULL TIME' });
 
+      // 미입력 선수 자동 번호 할당 카운터
+      let unnamedPlayerCounter = 1;
+
       finalStream.forEach(item => {
         const div = document.createElement('div');
         div.className = 'v-timeline-item';
@@ -995,10 +1000,13 @@
             if (evt.type === 'SUB') {
               let subRowsHtml = '';
               evt.subs.forEach(s => {
+                const outName = (s.out && s.out.trim() !== '' && s.out.trim() !== '-') ? s.out : `Player ${unnamedPlayerCounter++}`;
+                const inName = (s.in && s.in.trim() !== '' && s.in.trim() !== '-') ? s.in : `Player ${unnamedPlayerCounter++}`;
+
                 subRowsHtml += `
                   <div class="sub-card-row">
-                    <span class="sub-name-out">${s.out || '-'}</span>
-                    <span class="sub-name-in">${s.in || '-'}</span>
+                    <span class="sub-name-out">${outName}</span>
+                    <span class="sub-name-in">${inName}</span>
                   </div>
                 `;
               });
@@ -1042,15 +1050,23 @@
                 assistHtml = `<span class="assist-tag">👟 Ast: ${evt.p2}</span>`;
               }
 
+              // 선수명이 있을 때만 렌더링 (미입력 시 팀 약어 노출 방지)
+              let playerNameHtml = '';
+              if (evt.p1 && evt.p1.trim() !== '' && evt.p1.trim() !== '-') {
+                playerNameHtml = `
+                  <div class="player-name-text">
+                    ${evt.p1}
+                    ${countBadgeHtml}
+                  </div>
+                `;
+              }
+
               cardContent = `
                 <div class="event-card ${cardHighlightClass}">
                   <div class="event-card-header ${headerClass}">
                     ${headerText}
                   </div>
-                  <div class="player-name-text">
-                    ${evt.p1 || evt.team}
-                    ${countBadgeHtml}
-                  </div>
+                  ${playerNameHtml}
                   ${assistHtml}
                 </div>
               `;
@@ -1077,6 +1093,7 @@
       });
     }
 
+    // ★ 스탯 카드 매치 정보 바 제목 제거, 흰색 통일, Home/Away 표기 간소화 ★
     function renderMatchStatsCard(data) {
       const matchDate = data[1] ? data[1][1] : '2026-10-31';
       const matchTime = data[2] ? data[2][1] : '23:00';
@@ -1122,13 +1139,14 @@
       const statsCard = document.getElementById('stats-card-target');
       if (!statsCard) return;
 
+      // 제목 제거 & pure white 색상 및 Away/Home 표기 적용
       const infoBarHtml = `
         <div class="match-info-bar">
-          <div class="info-item"><span class="info-label">DATE</span><span class="info-value">${matchDate}</span></div>
-          <div class="info-item"><span class="info-label">TIME</span><span class="info-value">${matchTime}</span></div>
-          <div class="info-item"><span class="info-label">COMPETITION</span><span class="info-value highlight">${compType} (${compRound})</span></div>
-          <div class="info-item"><span class="info-label">VENUE</span><span class="info-value">${stadium}</span></div>
-          <div class="info-item"><span class="info-label">MATCH TYPE</span><span class="info-value highlight">${isAway ? 'AWAY MATCH' : 'HOME MATCH'}</span></div>
+          <div class="info-item"><span class="info-value">${matchDate}</span></div>
+          <div class="info-item"><span class="info-value">${matchTime}</span></div>
+          <div class="info-item"><span class="info-value">${compType} (${compRound})</span></div>
+          <div class="info-item"><span class="info-value">${stadium}</span></div>
+          <div class="info-item"><span class="info-value">${isAway ? 'Away' : 'Home'}</span></div>
         </div>
       `;
 
@@ -1180,7 +1198,6 @@
     }
 
     window.onload = () => {
-      // 페이지 로드 시 기존 저장된 정보로 자동 동기화 시도
       syncSheetData(false);
     };
   </script>
