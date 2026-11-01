@@ -170,7 +170,6 @@
       text-shadow: 0 4px 12px rgba(239, 1, 7, 0.3);
     }
 
-    /* ★ 소제목 하단 여백 확장 (20px -> 28px) ★ */
     .section-title {
       font-size: 14px;
       color: var(--arsenal-gold);
@@ -356,17 +355,17 @@
       text-align: left;
     }
 
+    /* ★ GOAL 테두리 굵기 2px로 확장 ★ */
     .event-card.goal-card {
-      border: 1px solid var(--arsenal-gold) !important;
-      box-shadow: 0 4px 16px rgba(209, 178, 128, 0.25);
+      border: 2px solid var(--arsenal-gold) !important;
+      box-shadow: 0 4px 16px rgba(209, 178, 128, 0.35);
     }
 
     .event-card.og-card {
-      border: 1px solid #ff4d4f !important;
-      box-shadow: 0 4px 16px rgba(255, 77, 79, 0.25);
+      border: 2px solid #ff4d4f !important;
+      box-shadow: 0 4px 16px rgba(255, 77, 79, 0.35);
     }
 
-    /* ★ 타임라인 헤더와 선수 이름 간격 조정 ★ */
     .event-card-header {
       font-size: 12px;
       font-weight: 600;
@@ -378,12 +377,18 @@
       border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
     }
 
+    /* ★ 선수 이름이 없을 경우 하단 점선 제거용 클래스 ★ */
+    .event-card-header.no-border {
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+    }
+
     .event-card-header.goal { color: var(--arsenal-gold); }
     .event-card-header.og { color: #ff4d4f; }
     .event-card-header.yc { color: #fadb14; }
     .event-card-header.rc { color: #ff4d4f; }
+    .event-card-header.sub { color: #52c41a; }
 
-    /* ★ 선수 이름 상단 여백 확장 (3px -> 8px) ★ */
     .player-name-text {
       font-size: 15px;
       font-weight: 800;
@@ -852,7 +857,7 @@
       }
     }
 
-    // ★ 타임라인 선수 미입력 처리 및 순차 Player 1, 2 자동 할당 로직 적용 ★
+    // ★ 옵션 A(교체 간소화) 및 미입력 점선 제거 로직 반영 ★
     function renderTimeline(data) {
       const tlContainer = document.getElementById('timeline-target');
       tlContainer.innerHTML = '<div class="v-timeline-line"></div>';
@@ -962,9 +967,6 @@
       }
       finalStream.push({ isBoundary: true, text: 'FULL TIME' });
 
-      // 미입력 선수 자동 번호 할당 카운터
-      let unnamedPlayerCounter = 1;
-
       finalStream.forEach(item => {
         const div = document.createElement('div');
         div.className = 'v-timeline-item';
@@ -981,29 +983,42 @@
 
             let cardContent = '';
             if (evt.type === 'SUB') {
-              let subRowsHtml = '';
-              evt.subs.forEach(s => {
-                const outName = (s.out && s.out.trim() !== '' && s.out.trim() !== '-') ? s.out : `Player ${unnamedPlayerCounter++}`;
-                const inName = (s.in && s.in.trim() !== '' && s.in.trim() !== '-') ? s.in : `Player ${unnamedPlayerCounter++}`;
+              // 교체 선수 존재 여부 확인
+              const hasValidPlayers = evt.subs.some(s => (s.out && s.out.trim() !== '' && s.out.trim() !== '-') || (s.in && s.in.trim() !== '' && s.in.trim() !== '-'));
 
-                subRowsHtml += `
-                  <div class="sub-card-row">
-                    <span class="sub-name-out">${outName}</span>
-                    <span class="sub-name-in">${inName}</span>
+              if (hasValidPlayers) {
+                // 아스널 등 선수명이 제대로 입력되어 있는 경
+                let subRowsHtml = '';
+                evt.subs.forEach(s => {
+                  subRowsHtml += `
+                    <div class="sub-card-row">
+                      <span class="sub-name-out">${s.out || '-'}</span>
+                      <span class="sub-name-in">${s.in || '-'}</span>
+                    </div>
+                  `;
+                });
+                cardContent = `
+                  <div class="event-card">
+                    <div class="sub-card-container">
+                      <div class="sub-card-header">
+                        <span class="header-out">🔻 OUT</span>
+                        <span class="header-in">🟢 IN</span>
+                      </div>
+                      ${subRowsHtml}
+                    </div>
                   </div>
                 `;
-              });
-              cardContent = `
-                <div class="event-card">
-                  <div class="sub-card-container">
-                    <div class="sub-card-header">
-                      <span class="header-out">🔻 OUT</span>
-                      <span class="header-in">🟢 IN</span>
+              } else {
+                // ★ 옵션 A: 선수 미입력 상대팀 교체의 간소화 텍스트 처리 ★
+                const subCountText = evt.subs.length > 1 ? `${evt.subs.length} Players Swapped` : 'Substitution';
+                cardContent = `
+                  <div class="event-card">
+                    <div class="event-card-header sub no-border">
+                      🔄 ${subCountText}
                     </div>
-                    ${subRowsHtml}
                   </div>
-                </div>
-              `;
+                `;
+              }
             } else {
               let headerText = '⚽ GOAL';
               let headerClass = 'goal';
@@ -1033,9 +1048,12 @@
                 assistHtml = `<span class="assist-tag">👟 Ast: ${evt.p2}</span>`;
               }
 
-              // 선수명이 있을 때만 렌더링 (미입력 시 팀 약어 노출 방지)
+              // ★ 선수 이름 존재 여부에 따른 점선 유무(no-border 클래스) 제어 ★
+              const hasPlayer = (evt.p1 && evt.p1.trim() !== '' && evt.p1.trim() !== '-');
+              const borderClass = hasPlayer ? '' : 'no-border';
+
               let playerNameHtml = '';
-              if (evt.p1 && evt.p1.trim() !== '' && evt.p1.trim() !== '-') {
+              if (hasPlayer) {
                 playerNameHtml = `
                   <div class="player-name-text">
                     ${evt.p1}
@@ -1046,7 +1064,7 @@
 
               cardContent = `
                 <div class="event-card ${cardHighlightClass}">
-                  <div class="event-card-header ${headerClass}">
+                  <div class="event-card-header ${headerClass} ${borderClass}">
                     ${headerText}
                   </div>
                   ${playerNameHtml}
@@ -1076,7 +1094,6 @@
       });
     }
 
-    // ★ 스탯 카드 매치 정보 바 제목 제거, 흰색 통일, Home/Away 표기 간소화 ★
     function renderMatchStatsCard(data) {
       const matchDate = data[1] ? data[1][1] : '2026-10-31';
       const matchTime = data[2] ? data[2][1] : '23:00';
@@ -1122,7 +1139,6 @@
       const statsCard = document.getElementById('stats-card-target');
       if (!statsCard) return;
 
-      // 제목 제거 & pure white 색상 및 Away/Home 표기 적용
       const infoBarHtml = `
         <div class="match-info-bar">
           <div class="info-item"><span class="info-value">${matchDate}</span></div>
