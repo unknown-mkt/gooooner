@@ -769,9 +769,11 @@
       const isAway = haType.toLowerCase() === 'away';
 
       if (data[5]) awayTeam = data[5][1] || data[5][2] || 'Chelsea';
-      if (data[3] && data[3][4] === 'Score') {
-        arsScore = data[3][5] || '0';
-        awayScore = data[3][6] || '0';
+
+      // ★ data[3](4행)을 data[2](3행: Score 위치)로 수정 ★
+      if (data[2] && data[2][4] === 'Score') {
+        arsScore = data[2][5] || '0';
+        awayScore = data[2][6] || '0';
       }
 
       const leftTeam = isAway ? awayTeam : "Arsenal";
@@ -782,6 +784,7 @@
       document.getElementById('away-team-stats').innerText = rightTeam;
       document.getElementById('score-stats').innerText = scoreText;
     }
+
 
     function renderPitch(data) {
       const pitchTarget = document.getElementById('pitch-target');
