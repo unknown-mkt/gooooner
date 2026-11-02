@@ -1009,12 +1009,10 @@
                   </div>
                 `;
               } else {
-                // ★ 옵션 A: 선수 미입력 상대팀 교체의 간소화 텍스트 처리 ★
-                const subCountText = evt.subs.length > 1 ? `${evt.subs.length} Players Swapped` : 'SUBSTITUTION';
                 cardContent = `
                   <div class="event-card">
                     <div class="event-card-header sub no-border">
-                      🔄 ${subCountText}
+                      🔄 Substitution
                     </div>
                   </div>
                 `;
