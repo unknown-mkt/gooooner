@@ -563,18 +563,29 @@
       transition: width 0.3s ease;
     }
 
-    .footer-text {
-      text-align: right;
-      font-size: 12px;
-      color: var(--pl-sub-text);
-      padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      margin-top: 30px;
-    }
+.footer-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--pl-sub-text);
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: auto; /* 카드 바닥에 자동 밀착 */
+  padding-bottom: 4px;
+}
 
-    .footer-text b {
-      color: var(--arsenal-gold);
-    }
+/* 상단 요소와의 최소 간격을 30px로 보장 */
+.capture-card > .footer-text {
+  margin-top: max(30px, auto); 
+}
+
+.footer-left b,
+.footer-right b {
+  color: var(--arsenal-gold);
+  font-weight: 700;
+}
+
 
     .bench-container {
       margin-top: 16px;
@@ -651,7 +662,10 @@
           </div>
         </div>
         <div id="stats-card-target"></div>
-        <div class="footer-text">Copyright 2026. <b>goooooner</b> All rights reserved.</div>
+<div class="footer-text">
+  <span class="footer-left">Data source: <b>Premier League</b>, <b>Arsenal.com</b></span>
+  <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
+</div>
       </div>
     </div>
 
@@ -660,7 +674,10 @@
       <div id="capture-area-pitch" class="capture-card">
         <div class="section-title">Starting XI</div>
         <div class="pitch" id="pitch-target"></div>
-        <div class="footer-text">Copyright 2026. <b>goooooner</b> All rights reserved.</div>
+<div class="footer-text">
+  <span class="footer-left">Data source: <b>Premier League</b>, <b>Arsenal.com</b></span>
+  <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
+</div>
       </div>
     </div>
 
@@ -671,7 +688,10 @@
         <div class="v-timeline-container" id="timeline-target">
           <div class="v-timeline-line"></div>
         </div>
-        <div class="footer-text">Copyright 2026. <b>goooooner</b> All rights reserved.</div>
+<div class="footer-text">
+  <span class="footer-left">Data source: <b>Premier League</b>, <b>Arsenal.com</b></span>
+  <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
+</div>
       </div>
     </div>
   </div>
