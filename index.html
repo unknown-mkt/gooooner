@@ -571,13 +571,8 @@
   color: var(--pl-sub-text);
   padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  margin-top: auto; /* 카드 바닥에 자동 밀착 */
-  padding-bottom: 4px;
-}
-
-/* 상단 요소와의 최소 간격을 30px로 보장 */
-.capture-card > .footer-text {
-  margin-top: max(30px, auto); 
+  margin-top: 30px !important; /* 오류 구문 제거 및 30px 간격 강제 적용 */
+  margin-bottom: 4px;
 }
 
 .footer-left b,
