@@ -1115,8 +1115,10 @@
       const haType = (data[6] && data[6][1]) ? data[6][1].trim() : 'Away';
       const isAway = haType.toLowerCase() === 'away';
 
-      const compType = (data[8] && data[8][1]) ? data[8][1] : 'PL';
-      const compRound = (data[8] && data[8][2]) ? data[8][2] : '';
+      // data[8] (9행) 대신 data[7] (8행)으로 변경
+      const compType = (data[7] && data[7][1]) ? data[7][1] : 'PL';
+      const compRound = (data[7] && data[7][2]) ? data[7][2] : '';
+
 
       const statList = [];
 
