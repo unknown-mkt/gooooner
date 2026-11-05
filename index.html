@@ -31,7 +31,6 @@
       gap: 24px;
     }
 
-    /* 설정 패널 */
     .config-panel {
       width: 100%;
       max-width: 860px;
@@ -177,16 +176,11 @@
       text-transform: uppercase;
       letter-spacing: 1.5px;
       margin: 28px 0;
-      
-      /* 포인트와 타이틀 전체를 오른쪽(안쪽)으로 밀어 넣기 */
       padding-left: 12px; 
-      
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
-
 
     .section-title::before {
       content: '';
@@ -361,7 +355,6 @@
       text-align: left;
     }
 
-    /* ★ GOAL 테두리 굵기 2px로 확장 ★ */
     .event-card.goal-card {
       border: 2px solid var(--arsenal-gold) !important;
       box-shadow: 0 4px 16px rgba(209, 178, 128, 0.35);
@@ -383,7 +376,6 @@
       border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
     }
 
-    /* ★ 선수 이름이 없을 경우 하단 점선 제거용 클래스 ★ */
     .event-card-header.no-border {
       border-bottom: none !important;
       padding-bottom: 0 !important;
@@ -569,29 +561,23 @@
       transition: width 0.3s ease;
     }
 
-.footer-text {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  color: var(--pl-sub-text);
-  
-  /* 구분선 설정 */
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 14px; /* 구분선과 글자 사이의 간격 */
-  
-  /* Red Cards와 구분선 사이의 위쪽 간격을 28px로 확실히 띄움 */
-  margin-top: 28px !important;
-  margin-bottom: 0;
-}
+    .footer-text {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--pl-sub-text);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 14px;
+      margin-top: 28px !important;
+      margin-bottom: 0;
+    }
 
-.footer-left b,
-.footer-right b {
-  color: var(--arsenal-gold);
-  font-weight: 700;
-}
-
-
+    .footer-left b,
+    .footer-right b {
+      color: var(--arsenal-gold);
+      font-weight: 700;
+    }
 
     .bench-container {
       margin-top: 16px;
@@ -668,10 +654,10 @@
           </div>
         </div>
         <div id="stats-card-target"></div>
-<div class="footer-text">
-  <span class="footer-left">Source: <b>Premier League</b> | <b>Arsenal.com</b></span>
-  <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
-</div>
+        <div class="footer-text">
+          <span class="footer-left">Source: <b>Arsenal.com</b></span>
+          <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
+        </div>
       </div>
     </div>
 
@@ -680,10 +666,10 @@
       <div id="capture-area-pitch" class="capture-card">
         <div class="section-title">Starting XI</div>
         <div class="pitch" id="pitch-target"></div>
-<div class="footer-text">
-  <span class="footer-left">Source: <b>Premier League</b> | <b>Arsenal.com</b></span>
-  <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
-</div>
+        <div class="footer-text">
+          <span class="footer-left">Source: <b>Arsenal.com</b></span>
+          <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
+        </div>
       </div>
     </div>
 
@@ -694,10 +680,10 @@
         <div class="v-timeline-container" id="timeline-target">
           <div class="v-timeline-line"></div>
         </div>
-<div class="footer-text">
-  <span class="footer-left">Source: <b>Premier League</b> | <b>Arsenal.com</b></span>
-  <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
-</div>
+        <div class="footer-text">
+          <span class="footer-left">Source: <b>Arsenal.com</b></span>
+          <span class="footer-right">Copyright 2026. <b>goooooner</b> All rights reserved.</span>
+        </div>
       </div>
     </div>
   </div>
@@ -778,14 +764,21 @@
     }
 
     function renderHeader(data) {
-      let awayTeam = 'Chelsea';
+      let awayTeam = 'Opponent';
       let arsScore = '0';
       let awayScore = '0';
 
       const haType = (data[6] && data[6][1]) ? data[6][1].trim() : 'Away';
       const isAway = haType.toLowerCase() === 'away';
 
-      if (data[5]) awayTeam = data[5][1] || data[5][2] || 'Chelsea';
+      if (data[5]) {
+        const rawTeam = data[5][1] || '';
+        if (rawTeam.toLowerCase() === 'etc') {
+          awayTeam = (data[11] && data[11][2]) ? data[11][2].trim() : 'Opponent';
+        } else {
+          awayTeam = rawTeam || data[5][2] || 'Opponent';
+        }
+      }
 
       if (data[2] && data[2][4] === 'Score') {
         arsScore = data[2][5] || '0';
@@ -844,14 +837,14 @@
       }
 
       const subPlayers = [];
-      for (let r = 15; r < data.length; r++) {
+      for (let r = 16; r <= 28; r++) {
         const row = data[r];
         if (!row || !row[8]) continue;
 
         const num = row[9] || '';
         const name = row[10] || '';
 
-        if (name && name !== '-') {
+        if (name && name !== '-' && name.trim() !== '') {
           subPlayers.push({ num, name });
         }
       }
@@ -883,7 +876,6 @@
       }
     }
 
-    // ★ 옵션 A(교체 간소화) 및 미입력 점선 제거 로직 반영 ★
     function renderTimeline(data) {
       const tlContainer = document.getElementById('timeline-target');
       tlContainer.innerHTML = '<div class="v-timeline-line"></div>';
@@ -906,7 +898,7 @@
         return null;
       }
 
-      for (let r = 29; r < data.length; r++) {
+      for (let r = 35; r < data.length; r++) {
         const row = data[r];
         if (!row || !row[0] || !row[1]) continue;
 
@@ -1009,11 +1001,9 @@
 
             let cardContent = '';
             if (evt.type === 'SUB') {
-              // 교체 선수 존재 여부 확인
               const hasValidPlayers = evt.subs.some(s => (s.out && s.out.trim() !== '' && s.out.trim() !== '-') || (s.in && s.in.trim() !== '' && s.in.trim() !== '-'));
 
               if (hasValidPlayers) {
-                // 아스널 등 선수명이 제대로 입력되어 있는 경
                 let subRowsHtml = '';
                 evt.subs.forEach(s => {
                   subRowsHtml += `
@@ -1072,7 +1062,6 @@
                 assistHtml = `<span class="assist-tag">👟 Ast: ${evt.p2}</span>`;
               }
 
-              // ★ 선수 이름 존재 여부에 따른 점선 유무(no-border 클래스) 제어 ★
               const hasPlayer = (evt.p1 && evt.p1.trim() !== '' && evt.p1.trim() !== '-');
               const borderClass = hasPlayer ? '' : 'no-border';
 
@@ -1119,42 +1108,40 @@
     }
 
     function renderMatchStatsCard(data) {
-      const matchDate = data[1] ? data[1][1] : '2026-10-31';
+      const matchDate = data[1] ? data[1][1] : '2026-11-05';
       const matchTime = data[2] ? data[2][1] : '23:00';
-      const awayTeamName = data[5] ? data[5][1] : 'Chelsea';
-      const stadium = data[6] ? data[6][2] : 'Stamford Bridge';
-      const haType = data[6] ? data[6][1] : 'Away';
+      
+      let awayTeamName = 'Opponent';
+      if (data[5]) {
+        const rawTeam = data[5][1] || '';
+        if (rawTeam.toLowerCase() === 'etc') {
+          awayTeamName = (data[11] && data[11][2]) ? data[11][2].trim() : 'Opponent';
+        } else {
+          awayTeamName = rawTeam || data[5][2] || 'Opponent';
+        }
+      }
 
+      const stadium = (data[7] && data[7][2]) ? data[7][2] : 'Emirates Stadium';
+      const haType = data[7] ? data[7][1] : 'Away';
       const isAway = haType.trim().toLowerCase() === 'away';
 
-      const compType = (data[7] && data[7][1]) ? data[7][1] : 'PL';
-      const compRound = (data[7] && data[7][2]) ? data[7][2] : 'Round 10';
+      const compType = (data[8] && data[8][1]) ? data[8][1] : 'PL';
+      const compRound = (data[8] && data[8][2]) ? data[8][2] : '';
 
-      const group2Start = 'Total Shot';
-      const group3Start = 'Touches';
-      const group4Start = 'Duels Won';
+      const statList = [];
 
-      const groups = [[], [], [], []];
-      let currentGroupIndex = 0;
-
-      for (let r = 3; r <= 21; r++) {
+      for (let r = 4; r <= 13; r++) {
         const row = data[r];
         if (!row || !row[4]) continue;
 
         const name = row[4].trim();
-        if (name === 'Score') continue;
-
-        if (name === group2Start) currentGroupIndex = 1;
-        else if (name === group3Start) currentGroupIndex = 2;
-        else if (name === group4Start) currentGroupIndex = 3;
-
         let homeRaw = row[5] !== undefined ? row[5].toString().replace('%', '') : '0';
         let awayRaw = row[6] !== undefined ? row[6].toString().replace('%', '') : '0';
 
-        groups[currentGroupIndex].push({
+        statList.push({
           name,
-          homeDisplay: row[5],
-          awayDisplay: row[6],
+          homeDisplay: row[5] || '0',
+          awayDisplay: row[6] || '0',
           homeVal: parseFloat(homeRaw) || 0,
           awayVal: parseFloat(awayRaw) || 0
         });
@@ -1167,55 +1154,48 @@
         <div class="match-info-bar">
           <div class="info-item"><span class="info-value">${matchDate}</span></div>
           <div class="info-item"><span class="info-value">${matchTime}</span></div>
-          <div class="info-item"><span class="info-value">${compType} (${compRound})</span></div>
+          <div class="info-item"><span class="info-value">${compType} ${compRound ? '(' + compRound + ')' : ''}</span></div>
           <div class="info-item"><span class="info-value">${stadium}</span></div>
         </div>
       `;
 
-      function renderGroupHtml(statList) {
-        if (!statList || statList.length === 0) return '';
-        let html = '<div class="stats-group">';
-        statList.forEach(s => {
-          const total = s.homeVal + s.awayVal;
-          const homeWidth = total > 0 ? (s.homeVal / total) * 100 : 0;
-          const awayWidth = total > 0 ? (s.awayVal / total) * 100 : 0;
+      let statsHtml = '<div class="stats-group">';
+      statList.forEach(s => {
+        const total = s.homeVal + s.awayVal;
+        const homeWidth = total > 0 ? (s.homeVal / total) * 100 : 50;
+        const awayWidth = total > 0 ? (s.awayVal / total) * 100 : 50;
 
-          const leftVal = isAway ? s.awayDisplay : s.homeDisplay;
-          const rightVal = isAway ? s.homeDisplay : s.awayDisplay;
-          const leftWidth = isAway ? awayWidth : homeWidth;
-          const rightWidth = isAway ? homeWidth : awayWidth;
-          
-          const leftBarClass = isAway ? 'bar-fill-away' : 'bar-fill-home';
-          const rightBarClass = isAway ? 'bar-fill-home' : 'bar-fill-away';
+        const leftVal = isAway ? s.awayDisplay : s.homeDisplay;
+        const rightVal = isAway ? s.homeDisplay : s.awayDisplay;
+        const leftWidth = isAway ? awayWidth : homeWidth;
+        const rightWidth = isAway ? homeWidth : awayWidth;
+        
+        const leftBarClass = isAway ? 'bar-fill-away' : 'bar-fill-home';
+        const rightBarClass = isAway ? 'bar-fill-home' : 'bar-fill-away';
 
-          const leftTextColor = isAway ? '#ffffff' : 'var(--arsenal-red)';
-          const rightTextColor = isAway ? 'var(--arsenal-red)' : '#ffffff';
+        const leftTextColor = isAway ? '#ffffff' : 'var(--arsenal-red)';
+        const rightTextColor = isAway ? 'var(--arsenal-red)' : '#ffffff';
 
-          html += `
-            <div class="stat-row">
-              <div class="stat-val left-side" style="color: ${leftTextColor};">${leftVal}</div>
-              <div class="stat-bar-wrapper left-side">
-                <div class="${leftBarClass}" style="width: ${leftWidth}%;"></div>
-              </div>
-              <div class="stat-name">${s.name}</div>
-              <div class="stat-bar-wrapper right-side">
-                <div class="${rightBarClass}" style="width: ${rightWidth}%;"></div>
-              </div>
-              <div class="stat-val right-side" style="color: ${rightTextColor};">${rightVal}</div>
+        statsHtml += `
+          <div class="stat-row">
+            <div class="stat-val left-side" style="color: ${leftTextColor};">${leftVal}</div>
+            <div class="stat-bar-wrapper left-side">
+              <div class="${leftBarClass}" style="width: ${leftWidth}%;"></div>
             </div>
-          `;
-        });
-        html += '</div>';
-        return html;
-      }
+            <div class="stat-name">${s.name}</div>
+            <div class="stat-bar-wrapper right-side">
+              <div class="${rightBarClass}" style="width: ${rightWidth}%;"></div>
+            </div>
+            <div class="stat-val right-side" style="color: ${rightTextColor};">${rightVal}</div>
+          </div>
+        `;
+      });
+      statsHtml += '</div>';
 
       statsCard.innerHTML = `
         ${infoBarHtml}
         <div class="section-title">PERFORMANCE STATUS</div>
-        ${renderGroupHtml(groups[0])}
-        ${renderGroupHtml(groups[1])}
-        ${renderGroupHtml(groups[2])}
-        ${renderGroupHtml(groups[3])}
+        ${statsHtml}
       `;
     }
 
